@@ -1,6 +1,8 @@
 package io.dropwizard.lifecycle.setup;
 
+import com.google.common.util.concurrent.Service;
 import io.dropwizard.lifecycle.JettyManaged;
+import io.dropwizard.lifecycle.JettyService;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import org.eclipse.jetty.server.Server;
@@ -43,6 +45,17 @@ public class LifecycleEnvironment {
     }
 
     /**
+     * Adds the given {@link Service} instance to the set of objects managed by the server's
+     * lifecycle. When the server starts, {@code service} will be started. When the server stops,
+     * {@code service} will be stopped.
+     *
+     * @param service a service
+     */
+    public void manage(Service service) {
+        managedObjects.add(new JettyService(requireNonNull(service)));
+    }
+
+    /**
      * Adds the given Jetty {@link LifeCycle} instances to the server's lifecycle.
      *
      * @param managed a Jetty-managed object
@@ -54,7 +67,7 @@ public class LifecycleEnvironment {
     public ExecutorServiceBuilder executorService(String nameFormat) {
         return new ExecutorServiceBuilder(this, nameFormat);
     }
-    
+
     public ExecutorServiceBuilder executorService(String nameFormat, ThreadFactory factory) {
         return new ExecutorServiceBuilder(this, nameFormat, factory);
     }
@@ -62,7 +75,7 @@ public class LifecycleEnvironment {
     public ScheduledExecutorServiceBuilder scheduledExecutorService(String nameFormat) {
         return scheduledExecutorService(nameFormat, false);
     }
-    
+
     public ScheduledExecutorServiceBuilder scheduledExecutorService(String nameFormat, ThreadFactory factory) {
         return new ScheduledExecutorServiceBuilder(this, nameFormat, factory);
     }
